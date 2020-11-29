@@ -29,7 +29,7 @@ public class GraphicsDisplay extends JPanel {
 
     public GraphicsDisplay() {
         setBackground(Color.WHITE);
-        graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, new float[] {1, 1, 1, 1, 1, 1, 3, 1, 2, 1, 2,1}, 0.0f);
+        graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, new float[]{1, 1, 1, 1, 1, 1, 3, 1, 2, 1, 2, 1}, 0.0f);
         axisStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         markerStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         axisFont = new Font("Serif", Font.BOLD, 36);
@@ -134,7 +134,7 @@ minY
     protected void paintGraphics(Graphics2D canvas) {
         canvas.setStroke(graphicsStroke);       // Выбрать линию для рисования графика
         canvas.setColor(Color.RED);     // Выбрать цвет линии
-        
+
         GeneralPath graphics = new GeneralPath();
         for (int i = 0; i < graphicsData.length; i++) {
 // Преобразовать значения (x,y) в точку на экране point
@@ -150,12 +150,14 @@ minY
 
     // Отображение маркеров точек, по которым рисовался график
     protected void paintMarkers(Graphics2D canvas) {
-// Шаг 1 - Установить специальное перо для черчения контуров маркеров
         canvas.setStroke(markerStroke);
-        canvas.setColor(Color.RED);
-        canvas.setPaint(Color.RED);
 
-// Шаг 2 - Организовать цикл по всем точкам графика
+        Double cr_sum = 0.0;
+        for (Double[] point : graphicsData) {
+            cr_sum += point[1];
+        }
+        cr_sum /= graphicsData.length;
+
         for (Double[] point : graphicsData) {
 
             GeneralPath marker = new GeneralPath();
@@ -167,6 +169,14 @@ minY
             marker.lineTo(center.x - d / 2, center.y - d / 2);
             marker.lineTo(center.x, center.y + d / 2);
             marker.closePath();
+
+            if (2 * point[1] > cr_sum) {
+                canvas.setColor(Color.BLUE);
+                canvas.setPaint(Color.BLUE);
+            } else {
+                canvas.setColor(Color.RED);
+                canvas.setPaint(Color.RED);
+            }
 
             canvas.draw(marker); // Начертить контур маркера
             canvas.fill(marker); // Залить внутреннюю область маркера
