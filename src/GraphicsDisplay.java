@@ -29,7 +29,7 @@ public class GraphicsDisplay extends JPanel {
 
     public GraphicsDisplay() {
         setBackground(Color.WHITE);
-        graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, null, 0.0f);
+        graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, new float[] {1, 1, 1, 1, 1, 1, 3, 1, 2, 1, 2,1}, 0.0f);
         axisStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         markerStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         axisFont = new Font("Serif", Font.BOLD, 36);
@@ -134,12 +134,7 @@ minY
     protected void paintGraphics(Graphics2D canvas) {
         canvas.setStroke(graphicsStroke);       // Выбрать линию для рисования графика
         canvas.setColor(Color.RED);     // Выбрать цвет линии
-
-/* Будем рисовать линию графика как путь, состоящий из множества
-сегментов (GeneralPath)
-* Начало пути устанавливается в первую точку графика, после чего
-прямой соединяется со следующими точками
-*/
+        
         GeneralPath graphics = new GeneralPath();
         for (int i = 0; i < graphicsData.length; i++) {
 // Преобразовать значения (x,y) в точку на экране point
@@ -150,7 +145,6 @@ minY
                 graphics.moveTo(point.getX(), point.getY());        // Первая итерация цикла - установить начало пути в точку point
             }
         }
-// Отобразить график
         canvas.draw(graphics);
     }
 
@@ -163,17 +157,17 @@ minY
 
 // Шаг 2 - Организовать цикл по всем точкам графика
         for (Double[] point : graphicsData) {
-// Инициализировать эллипс как объект для представления маркера
-            Ellipse2D.Double marker = new Ellipse2D.Double();
-/* Эллипс будет задаваться посредством указания координат
-его центра
-и угла прямоугольника, в который он вписан */
-// Центр - в точке (x,y)
+
+            GeneralPath marker = new GeneralPath();
+
+            int d = 11;
             Point2D.Double center = xyToPoint(point[0], point[1]);
-// Угол прямоугольника - отстоит на расстоянии (3,3)
-            Point2D.Double corner = shiftPoint(center, 3, 3);
-// Задать эллипс по центру и диагонали
-            marker.setFrameFromCenter(center, corner);
+
+            marker.moveTo(center.x + d / 2, center.y - d / 2);
+            marker.lineTo(center.x - d / 2, center.y - d / 2);
+            marker.lineTo(center.x, center.y + d / 2);
+            marker.closePath();
+
             canvas.draw(marker); // Начертить контур маркера
             canvas.fill(marker); // Залить внутреннюю область маркера
         }
