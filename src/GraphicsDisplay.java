@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -13,6 +12,7 @@ public class GraphicsDisplay extends JPanel {
 
     private boolean showAxis = true;           // Флаговые переменные, задающие правила отображения графика
     private boolean showMarkers = true;
+    private boolean showLines = true;
 
     private double minX;          // Границы диапазона пространства, подлежащего отображению
     private double maxX;
@@ -24,6 +24,7 @@ public class GraphicsDisplay extends JPanel {
     private BasicStroke graphicsStroke;      // Различные стили черчения линий
     private BasicStroke axisStroke;
     private BasicStroke markerStroke;
+    private BasicStroke lineStroke;
 
     private Font axisFont;          // Различные шрифты отображения надписей
 
@@ -31,6 +32,7 @@ public class GraphicsDisplay extends JPanel {
         setBackground(Color.WHITE);
         graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, new float[]{1, 1, 1, 1, 1, 1, 3, 1, 2, 1, 2, 1}, 0.0f);
         axisStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
+        lineStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         markerStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         axisFont = new Font("Serif", Font.BOLD, 36);
     }
@@ -47,6 +49,11 @@ public class GraphicsDisplay extends JPanel {
 
     public void setShowMarkers(boolean showMarkers) {
         this.showMarkers = showMarkers;
+        repaint();
+    }
+
+    public void setShowLines(boolean showLines) {
+        this.showLines = showLines;
         repaint();
     }
 
@@ -115,12 +122,9 @@ minY
         Font oldFont = canvas.getFont();
 
 // Шаг 8 - В нужном порядке вызвать методы отображения элементов графика
-// Порядок вызова методов имеет значение, т.к. предыдущий рисунок будет затираться последующим
-// Первыми (если нужно) отрисовываются оси координат.
         if (showAxis) paintAxis(canvas);
-// Затем отображается сам график
         paintGraphics(canvas);
-// Затем (если нужно) отображаются маркеры точек, по которым строился график.
+        if (showLines) paintLines(canvas);
         if (showMarkers) paintMarkers(canvas);
 
 // Шаг 9 - Восстановить старые настройки холста
@@ -130,7 +134,6 @@ minY
         canvas.setStroke(oldStroke);
     }
 
-    // Отрисовка графика по прочитанным координатам
     protected void paintGraphics(Graphics2D canvas) {
         canvas.setStroke(graphicsStroke);       // Выбрать линию для рисования графика
         canvas.setColor(Color.RED);     // Выбрать цвет линии
@@ -148,7 +151,6 @@ minY
         canvas.draw(graphics);
     }
 
-    // Отображение маркеров точек, по которым рисовался график
     protected void paintMarkers(Graphics2D canvas) {
         canvas.setStroke(markerStroke);
 
@@ -183,7 +185,41 @@ minY
         }
     }
 
-    // Метод, обеспечивающий отображение осей координат
+    protected void paintLines(Graphics2D canvas) {
+        canvas.setStroke(lineStroke);
+        canvas.setColor(Color.CYAN);
+
+        Double max_y = 0.0;
+        for (Double[] point : graphicsData) {
+            if (point[1] > max_y) {
+                max_y = point[1];
+            }
+        }
+
+        FontRenderContext context = canvas.getFontRenderContext();
+
+        Point2D.Double center10_min = xyToPoint(minX, 0.1 * max_y);
+        Point2D.Double center10_max = xyToPoint(maxX, 0.1 * max_y);
+        Point2D.Double from10 = new Point2D.Double(center10_min.x, center10_min.y);
+        Point2D.Double to10 = new Point2D.Double(center10_max.x, center10_max.y);
+        Line2D.Double line10 = new Line2D.Double(from10, to10);
+        canvas.draw(line10);
+
+        Point2D.Double center50_min = xyToPoint(minX, 0.5 * max_y);
+        Point2D.Double center50_max = xyToPoint(maxX, 0.5 * max_y);
+        Point2D.Double from50 = new Point2D.Double(center50_min.x, center50_min.y);
+        Point2D.Double to50 = new Point2D.Double(center50_max.x, center50_max.y);
+        Line2D.Double line50 = new Line2D.Double(from50, to50);
+        canvas.draw(line50);
+
+        Point2D.Double center90_min = xyToPoint(minX, 0.9 * max_y);
+        Point2D.Double center90_max = xyToPoint(maxX, 0.9 * max_y);
+        Point2D.Double from90 = new Point2D.Double(center90_min.x, center90_min.y);
+        Point2D.Double to90 = new Point2D.Double(center90_max.x, center90_max.y);
+        Line2D.Double line90 = new Line2D.Double(from90, to90);
+        canvas.draw(line90);
+    }
+
     protected void paintAxis(Graphics2D canvas) {
         canvas.setStroke(axisStroke);
         canvas.setColor(Color.BLACK);
@@ -197,8 +233,7 @@ minY
 // Она должна быть видна, если левая граница показываемой области (minX) <= 0.0,
 // а правая (maxX) >= 0.0
 // Сама ось - это линия между точками (0, maxY) и (0, minY)
-            canvas.draw(new Line2D.Double(xyToPoint(0, maxY),
-                    xyToPoint(0, minY)));
+            canvas.draw(new Line2D.Double(xyToPoint(0, maxY), xyToPoint(0, minY)));
 // Стрелка оси Y
             GeneralPath arrow = new GeneralPath();
 // Установить начальную точку ломаной точно на верхний конец оси Y

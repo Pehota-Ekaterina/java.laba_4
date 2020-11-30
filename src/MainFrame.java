@@ -15,6 +15,7 @@ public class MainFrame extends JFrame {
 
     private JCheckBoxMenuItem showAxisMenuItem;      // Пункты меню
     private JCheckBoxMenuItem showMarkersMenuItem;
+    private JCheckBoxMenuItem showLinesOfLevelsItem;
 
     private GraphicsDisplay display = new GraphicsDisplay();           // Компонент-отображатель графика
 
@@ -52,28 +53,32 @@ public class MainFrame extends JFrame {
 
         Action showAxisAction = new AbstractAction("Показывать оси координат") {
             public void actionPerformed(ActionEvent event) {
-// свойство showAxis класса GraphicsDisplay истина, если элемент меню showAxisMenuItem отмечен флажком, и ложь - в противном случае
                 display.setShowAxis(showAxisMenuItem.isSelected());
             }
         };
-
         showAxisMenuItem = new JCheckBoxMenuItem(showAxisAction);
         graphicsMenu.add(showAxisMenuItem);
         showAxisMenuItem.setSelected(true);
 
         Action showMarkersAction = new AbstractAction("Показывать маркеры точек") {
             public void actionPerformed(ActionEvent event) {
-// по аналогии с showAxisMenuItem
                 display.setShowMarkers(showMarkersMenuItem.isSelected());
             }
         };
-
         showMarkersMenuItem = new JCheckBoxMenuItem(showMarkersAction);
         graphicsMenu.add(showMarkersMenuItem);
         showMarkersMenuItem.setSelected(true);
 
-        graphicsMenu.addMenuListener(new GraphicsMenuListener());       // Зарегистрировать обработчик событий, связанных с меню "График"
+        Action showLinesAction = new AbstractAction("Показывать линии уровней") {
+            public void actionPerformed(ActionEvent event) {
+                display.setShowLines(showLinesOfLevelsItem.isSelected());
+            }
+        };
+        showLinesOfLevelsItem = new JCheckBoxMenuItem(showLinesAction);
+        graphicsMenu.add(showLinesOfLevelsItem);
+        showLinesOfLevelsItem.setSelected(true);
 
+        graphicsMenu.addMenuListener(new GraphicsMenuListener());       // Зарегистрировать обработчик событий, связанных с меню "График"
         getContentPane().add(display, BorderLayout.CENTER);
     }
 
@@ -125,6 +130,7 @@ public class MainFrame extends JFrame {
 // Доступность или недоступность элементов меню "График" определяется загруженностью данных
             showAxisMenuItem.setEnabled(fileLoaded);
             showMarkersMenuItem.setEnabled(fileLoaded);
+            showLinesOfLevelsItem.setEnabled(fileLoaded);
         }
 
         // Обработчик, вызываемый после того, как меню исчезло с экрана
