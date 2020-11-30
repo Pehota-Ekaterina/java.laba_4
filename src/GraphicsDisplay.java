@@ -189,22 +189,22 @@ minY
         canvas.setStroke(lineStroke);
         canvas.setColor(Color.CYAN);
 
-        Point2D.Double center10_min = xyToPoint(minX, 0.1 * maxY);
-        Point2D.Double center10_max = xyToPoint(maxX, 0.1 * maxY);
+        Point2D.Double center10_min = xyToPoint(minX, 0.1 * (maxY -minY));
+        Point2D.Double center10_max = xyToPoint(maxX, 0.1 * (maxY -minY));
         Point2D.Double from10 = new Point2D.Double(center10_min.x, center10_min.y);
         Point2D.Double to10 = new Point2D.Double(center10_max.x, center10_max.y);
         Line2D.Double line10 = new Line2D.Double(from10, to10);
         canvas.draw(line10);
 
-        Point2D.Double center50_min = xyToPoint(minX, 0.5 * maxY);
-        Point2D.Double center50_max = xyToPoint(maxX, 0.5 * maxY);
+        Point2D.Double center50_min = xyToPoint(minX, 0.5 * (maxY -minY));
+        Point2D.Double center50_max = xyToPoint(maxX, 0.5 * (maxY -minY));
         Point2D.Double from50 = new Point2D.Double(center50_min.x, center50_min.y);
         Point2D.Double to50 = new Point2D.Double(center50_max.x, center50_max.y);
         Line2D.Double line50 = new Line2D.Double(from50, to50);
         canvas.draw(line50);
 
-        Point2D.Double center90_min = xyToPoint(minX, 0.9 * maxY);
-        Point2D.Double center90_max = xyToPoint(maxX, 0.9 * maxY);
+        Point2D.Double center90_min = xyToPoint(minX, 0.9 * (maxY -minY));
+        Point2D.Double center90_max = xyToPoint(maxX, 0.9 * (maxY -minY));
         Point2D.Double from90 = new Point2D.Double(center90_min.x, center90_min.y);
         Point2D.Double to90 = new Point2D.Double(center90_max.x, center90_max.y);
         Line2D.Double line90 = new Line2D.Double(from90, to90);
